@@ -1,0 +1,17 @@
+/* 
+  Aalto Journey Planner configuration
+  
+  Copy this file as config.js and insert the correct configuration
+
+  You need to setup a local proxy to reittiopas API to avoid cross-domain issues
+  Point the proxy to http://api.reittiopas.fi/hsl/prod/
+
+  Account can be requested from:
+  http://developer.reittiopas.fi/pages/en/account-request.php
+ */
+
+var config = {
+  "api":"http://localhost/reittiopas/hsl/prod/",
+  "user":"",
+  "pass":""
+}
