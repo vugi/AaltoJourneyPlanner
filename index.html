@@ -3,12 +3,13 @@
 <head>
   <title>AaltoJourneyPlanner</title>
   <script src="lib/jquery-1.7.min.js" type="text/javascript" charset="utf-8"></script>
+  <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
   <script src="config.js" type="text/javascript" charset="utf-8"></script>
   <script src="js/app.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
   <h1>Aalto Journey Planner</h2>
-  
-  <div id="results"></div>
+  <div id="map_canvas" style="width:80%; height:600px; float:left;"></div>
+  <div id="results" style="width: 19%; float:right;"></div>
 </body>
 </html>
