@@ -2,53 +2,49 @@
 <html>
 <head>
   <title>AaltoJourneyPlanner</title>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" type="text/css" href="css/common.css" charset="utf-8">
+
+  <!-- Include scripts -->
   <script src="lib/jquery-1.7.min.js" type="text/javascript" charset="utf-8"></script>
   <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
-  <script src="config.js" type="text/javascript" charset="utf-8"></script>
-  <script src="js/app.js" type="text/javascript" charset="utf-8"></script>
-  <style>
-    html, body {
-      width: 100%;
-      height: 100%;
-      font-family: sans-serif; 
-      padding: 0;
-      margin: 0;
-    }
-    h1 {
-      position:absolute; 
-      z-index: 100; 
-      margin-left: 100px; 
-      display:inline; 
-      background-color: white; 
-      padding: 10px;
-    }
-    #map_canvas {
-      width:100%; 
-      height:100%;
-    }
-    #results {
-      width: 20%;
-      position: absolute;
-      right: 0;
-      top: 0;
-      height: 100%;
-      overflow-y: scroll;
-      background: white;
-    }
-    .result {
-      padding: 20px;
-    }
-    .result:hover{
-      background-color: grey;
-    }
-    .result.selected {
-      background-color: lightgrey;
-    }
-  </style>
+
+
 </head>
 <body>
-  <h1>Aalto Journey Planner</h2>
+  <h1>Aalto Journey Planner</h1>
   <div id="map_canvas"></div>
-  <div id="results"></div>
+  <div id="results">
+    <div class="result selected">
+      <ol>
+        <li>05:01 walk</li>
+        <li>05:21 Bus 2</li>
+        <li>05:41 Bus 160</li>
+      </ol>
+    </div>
+    <div class="result">
+      <ol>
+        <li>05:01 walk</li>
+        <li>05:21 Bus 2</li>
+        <li>05:41 Bus 160</li>
+      </ol>
+    </div>
+    <div class="result">
+      <ol>
+        <li>05:01 walk</li>
+        <li>05:21 Bus 2</li>
+        <li>05:41 Bus 160</li>
+      </ol>
+    </div>
+
+  </div>
+
+  <!-- Application scripts -->
+  <script src="config.js" type="text/javascript" charset="utf-8"></script>
+  <script src="js/app.js" type="text/javascript" charset="utf-8"></script>
 </body>
 </html>

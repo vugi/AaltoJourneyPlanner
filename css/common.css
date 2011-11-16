@@ -1,0 +1,48 @@
+html, body {
+  width: 100%;
+  height: 100%;
+  font-family: Helvetica, Arial, sans-serif;
+  padding: 0;
+  margin: 0;
+}
+h1 {
+  position:absolute;
+  z-index: 100;
+  margin-left: 100px;
+  display:inline;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(0,0,0, .9);
+  font-size: 36px;
+}
+#map_canvas {
+  width:80%;
+  height:100%;
+}
+#results {
+  width: 20%;
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: white;
+  box-shadow: -1px -1px 10px rgba(0,0,0, .5);
+}
+.result {
+  padding: 20px;
+  margin: 5px;
+  border-radius: 2px;
+  box-shadow: 1px 1px 5px rgba(0,0,0, .2);
+  -webkit-transition: all .3s ease-in-out;
+  -moz-transition: all .3s ease-in-out;
+  transition: all .3s ease-in-out;
+}
+.result:hover{
+  background-color: #efe;
+  box-shadow: 1px 1px 5px rgba(0,0,0, .5);
+}
+.result.selected {
+  background-color: #cfc;
+  box-shadow: 1px 1px 5px rgba(0,0,0, .5);
+}
