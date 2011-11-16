@@ -74,16 +74,29 @@ $(document).ready(function(){
         var result = $("<div class='result'></div>");
         result.append("<h3>Route "+(i+1)+"</h3>");
 
-        var legs = $("<ul></ul>")
+        var legs = $("<ol></ol>").appendTo(result)
+        
         $.each(route.legs, function(i,leg){
-          legs.append("<li>"+getLegTypeString(leg.type) + " " + leg.length + "m</li>")
+          var legItem = $("<li></li>").appendTo(legs)
+          
+          var time = leg.locs[0].depTime;
+          legItem.append(time.substr(8,2)+":"+time.substr(10,2)+" ");
+          
+          var type = getLegTypeString(leg.type)
+          legItem.append(type + " ");
+          
+          if(type === "walk"){
+             legItem.append(leg.length + "m ");
+          } else {
+            legItem.append(leg.code.substr(1,4))
+          }
+          
           $.each(leg.locs,function(i,loc){
             routePath.push(new google.maps.LatLng(loc.coord.y,loc.coord.x))
           })
         });
-        result.append(legs)
 
-        result.append("Length: " + route.length);
+        result.append("Length: " + route.length + "m");
         result.append("<br/>Duration: " + route.duration/60 + " minutes");
         $("#results").append(result);
         
