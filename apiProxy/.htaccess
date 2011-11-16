@@ -1,0 +1,2 @@
+RewriteEngine On
+RewriteRule ^(.*)$ http://api.reittiopas.fi/$1 [P,L]

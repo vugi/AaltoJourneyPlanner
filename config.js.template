@@ -11,7 +11,7 @@
  */
 
 var config = {
-  "api":"http://localhost/reittiopas/hsl/prod/",
+  "api":"apiProxy/hsl/prod/",
   "user":"",
   "pass":""
 }
