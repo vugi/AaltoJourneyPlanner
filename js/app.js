@@ -96,8 +96,8 @@ $(document).ready(function(){
           })
         });
 
-        result.append("Length: " + route.length + "m");
-        result.append("<br/>Duration: " + route.duration/60 + " minutes");
+        //result.append("Length: " + route.length + "m<br/>");
+        result.append("Duration: " + route.duration/60 + " minutes");
         $("#results").append(result);
         
         // Show route on map when clicked
