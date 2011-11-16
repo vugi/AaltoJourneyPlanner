@@ -71,7 +71,7 @@ $(document).ready(function(){
         var route = val[0];
         var routePath= []
         
-        var result = $("<div></div>");
+        var result = $("<div class='result'></div>");
         result.append("<h3>Route "+(i+1)+"</h3>");
 
         var legs = $("<ul></ul>")
@@ -90,11 +90,14 @@ $(document).ready(function(){
         // Show route on map when clicked
         result.click(function(){
           polyline.setPath(routePath);
+          $(".result").removeClass("selected")
+          result.addClass("selected")
         })
         
         // Show the first result immediately
         if(i === 0){
           polyline.setPath(routePath);
+          result.addClass("selected")
         }
       });
     });
