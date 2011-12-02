@@ -8,6 +8,7 @@ $(document).ready(function(){
   var startMarker;
   var endMarker;
   var polyline;
+  var legLinesAndMarkers = [];
   
   function initializeMap() {
     var latlng = new google.maps.LatLng(60.18,24.89);
@@ -38,22 +39,102 @@ $(document).ready(function(){
     });
     endMarker.setMap(map);
     google.maps.event.addListener(endMarker, 'mouseup', getRoute);
-    
+
+  }
+
+  function createPolyline(path, transportTypeString) {
+    if(!path) {
+      path = [];
+      console.log("No path!");
+    }
+
+    var color = "#666666";
+
+    switch(transportTypeString) {
+      case "walk": color = "#666666"; break;
+      case "tram": color = "#009933"; break;
+      case "metro": color = "#FF6600"; break;
+      case "ferry": color = "#0000FF"; break;
+      case "train": color = "#FF0000"; break;
+      // bus
+      default: color = "#0000CC";
+    }
+
     polyline = new google.maps.Polyline({
-        path: [],
-        strokeColor: "#FF0000",
-        strokeOpacity: 1.0,
-        strokeWeight: 2
+        path: path,
+        strokeColor: color,
+        strokeOpacity: 0.6,
+        strokeWeight: 6
       });
     polyline.setMap(map);
+
+    return polyline;
   }
-  
+  function createMarker(LatLng, vehicle) {
+    var marker = new google.maps.Marker({
+      position: LatLng,
+      draggable: false,
+      title: vehicle+"",
+      icon: "https://chart.googleapis.com/chart?chst=d_map_spin&chld=1|0|cccccc|11|b|"+vehicle+""
+    });
+    marker.setMap(map);
+    return marker;
+  }
+
+  function showRoute(legs) {
+    // remove any current lines
+    for(var i in legLinesAndMarkers) {
+      legLinesAndMarkers[i]["polyline"].setMap(null);
+      if(legLinesAndMarkers[i]["marker"]) {
+        legLinesAndMarkers[i]["marker"].setMap(null);
+      }
+      legLinesAndMarkers[i] = null;
+    }
+    legLinesAndMarkers = [];
+
+    for(var i in legs) {
+      var leg = legs[i];
+      var type = getLegTypeString(leg.type);
+      var marker = null;
+      if (type !== "walk") {
+        var vehicleNumber = formatVehicleCode(leg.code,true);
+        marker = createMarker(
+          new google.maps.LatLng(leg.locs[0].coord.y,leg.locs[0].coord.x), vehicleNumber
+        );
+      }
+      var path = [];
+      $.each(leg.locs,function(i,loc){
+        path.push(new google.maps.LatLng(loc.coord.y,loc.coord.x))
+      });
+      var line = createPolyline(path, type);
+
+      legLinesAndMarkers.push({polyline: line, marker: marker});
+    }
+  }
+
+  function formatVehicleCode(code, forPin) {
+    if (forPin) {
+      return parseInt(code.substring(1,6));
+    }
+    var vehicleString = "";
+    var type = code.substring(0,1);
+    if (type === "1" || type === "2" || type === "4" || type === "5")
+        vehicleString = "Bus";
+    else if (type === "3")
+        vehicleString = "Train";
+
+    vehicleString += " " + parseInt(code.substring(1,6));
+
+    return vehicleString;
+  }
+
   function getRoute(){
     console.log("getRoute")
     // Clear current data
     $("#results").empty()
-    polyline.setPath([]);
-    
+    //polyline.setPath([]);
+    showRoute({});
+
     var fromLatLng = startMarker.getPosition()
     var from = fromLatLng.lng() + "," + fromLatLng.lat()
     console.log("from:"+from)
@@ -84,13 +165,15 @@ $(document).ready(function(){
           
           var type = getLegTypeString(leg.type)
           legItem.append(type + " ");
-          
+
           if(type === "walk"){
              legItem.append(leg.length + "m ");
           } else {
-            legItem.append(leg.code.substr(1,4))
+            /*legItem.append(leg.code.substr(1,4))*/
+            legItem.append(formatVehicleCode(leg.code));
           }
-          
+
+
           $.each(leg.locs,function(i,loc){
             routePath.push(new google.maps.LatLng(loc.coord.y,loc.coord.x))
           })
@@ -102,14 +185,14 @@ $(document).ready(function(){
         
         // Show route on map when clicked
         result.click(function(){
-          polyline.setPath(routePath);
+          showRoute(route.legs);
           $(".result").removeClass("selected")
           result.addClass("selected")
         })
         
         // Show the first result immediately
         if(i === 0){
-          polyline.setPath(routePath);
+          showRoute(route.legs);
           result.addClass("selected")
         }
       });
@@ -125,5 +208,14 @@ $(document).ready(function(){
       case "12": return "train"; break;
       default: return "bus";
     } 
+  }
+
+  function initializeTimeChooser() {
+    console.log("timeChooser");
+
+    $("body").append("<div id='overlay'></div>");
+
+    $("body").append("<div id='time-chooser'></div>");
+
   }
 });
