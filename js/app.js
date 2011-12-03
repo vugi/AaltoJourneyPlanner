@@ -42,40 +42,59 @@ $(document).ready(function(){
 
   }
 
+  function getTransportHex(type, variant) {
+    color = "";
+    switch(type) {
+      case "walk": color = "000000"; break;
+      case "tram": color = "009933"; break;
+      case "metro": color = "ff6600"; break;
+      case "ferry": color = "0000ff"; break;
+      case "train": color = "ff0000"; break;
+      // bus
+      default: color = "0000cc";
+    }
+
+    if (variant === "light") {
+      switch(type) {
+        case "walk": color = "999999"; break;
+        case "tram": color = "33cc66"; break;
+        case "metro": color = "ff9933"; break;
+        case "ferry": color = "9999ff"; break;
+        case "train": color = "ff3333"; break;
+        // bus
+        default: color = "3333ff";
+      }
+    }
+    return color;
+  }
+
   function createPolyline(path, transportTypeString) {
     if(!path) {
       path = [];
       console.log("No path!");
     }
 
-    var color = "#666666";
-
-    switch(transportTypeString) {
-      case "walk": color = "#666666"; break;
-      case "tram": color = "#009933"; break;
-      case "metro": color = "#FF6600"; break;
-      case "ferry": color = "#0000FF"; break;
-      case "train": color = "#FF0000"; break;
-      // bus
-      default: color = "#0000CC";
-    }
+    var color = "#"+getTransportHex(transportTypeString);
 
     polyline = new google.maps.Polyline({
         path: path,
         strokeColor: color,
-        strokeOpacity: 0.6,
-        strokeWeight: 6
+        strokeOpacity: 0.8,
+        strokeWeight: 6,
+        clickable: false
       });
     polyline.setMap(map);
 
     return polyline;
   }
-  function createMarker(LatLng, vehicle) {
+  function createMarker(LatLng, vehicle, type) {
+    var color = getTransportHex(type, 'light');
+
     var marker = new google.maps.Marker({
       position: LatLng,
       draggable: false,
       title: vehicle+"",
-      icon: "https://chart.googleapis.com/chart?chst=d_map_spin&chld=1|0|cccccc|11|b|"+vehicle+""
+      icon: "https://chart.googleapis.com/chart?chst=d_map_spin&chld=1|0|"+color+"|11|b|"+vehicle
     });
     marker.setMap(map);
     return marker;
@@ -97,9 +116,9 @@ $(document).ready(function(){
       var type = getLegTypeString(leg.type);
       var marker = null;
       if (type !== "walk") {
-        var vehicleNumber = formatVehicleCode(leg.code,true);
+        var vehicleNumber = formatVehicleCode(leg.code,type);
         marker = createMarker(
-          new google.maps.LatLng(leg.locs[0].coord.y,leg.locs[0].coord.x), vehicleNumber
+          new google.maps.LatLng(leg.locs[0].coord.y,leg.locs[0].coord.x), vehicleNumber, type
         );
       }
       var path = [];
@@ -112,18 +131,25 @@ $(document).ready(function(){
     }
   }
 
-  function formatVehicleCode(code, forPin) {
-    if (forPin) {
-      return parseInt(code.substring(1,6));
-    }
+  function formatVehicleCode(code,type) {
+    //console.log('code:'+code);
     var vehicleString = "";
-    var type = code.substring(0,1);
-    if (type === "1" || type === "2" || type === "4" || type === "5")
-        vehicleString = "Bus";
-    else if (type === "3")
-        vehicleString = "Train";
-
-    vehicleString += " " + parseInt(code.substring(1,6));
+    if (type === "train") {
+      vehicleString = code.substring(4,5);
+    } else if (type === "metro") {
+      vehicleString = "metro";
+    } else {
+      vehicleString = code.substring(1,6).trim();
+      var leadingZeros = 0;
+      for (var i in vehicleString) {
+        if(vehicleString[i] === "0") {
+          leadingZeros++;
+        } else {
+          break;
+        }
+      }
+      vehicleString = vehicleString.substring(leadingZeros);
+    }
 
     return vehicleString;
   }
@@ -170,7 +196,7 @@ $(document).ready(function(){
              legItem.append(leg.length + "m ");
           } else {
             /*legItem.append(leg.code.substr(1,4))*/
-            legItem.append(formatVehicleCode(leg.code));
+            legItem.append(formatVehicleCode(leg.code,type));
           }
 
 
