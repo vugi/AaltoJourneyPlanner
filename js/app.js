@@ -25,7 +25,7 @@ $(document).ready(function(){
       position: startDefaultLatLng,
       draggable: true,
       title: "Start",
-      icon: "images/route-start.png"
+      icon: "https://chart.googleapis.com/chart?chst=d_map_spin&chld=1|0|00ff00|12|b|Start"
     });
     startMarker.setMap(map);
     google.maps.event.addListener(startMarker, 'mouseup', getRoute);
@@ -35,7 +35,7 @@ $(document).ready(function(){
       position: endDefaultLatLng,
       draggable: true,
       title: "End",
-      icon: "images/route-end.png"
+      icon: "https://chart.googleapis.com/chart?chst=d_map_spin&chld=1|0|ff0000|12|b|End"
     });
     endMarker.setMap(map);
     google.maps.event.addListener(endMarker, 'mouseup', getRoute);
