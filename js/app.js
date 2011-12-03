@@ -45,24 +45,24 @@ $(document).ready(function(){
   function getTransportHex(type, variant) {
     color = "";
     switch(type) {
-      case "walk": color = "000000"; break;
-      case "tram": color = "009933"; break;
-      case "metro": color = "ff6600"; break;
-      case "ferry": color = "0000ff"; break;
-      case "train": color = "ff0000"; break;
+      case "walk": color = "499bff"; break;
+      case "tram": color = "00ae2e"; break;
+      case "metro": color = "fb6500"; break;
+      case "ferry": color = "00aee7"; break;
+      case "train": color = "e9001a"; break;
       // bus
-      default: color = "0000cc";
+      default: color = "193695";
     }
 
     if (variant === "light") {
       switch(type) {
-        case "walk": color = "999999"; break;
-        case "tram": color = "33cc66"; break;
-        case "metro": color = "ff9933"; break;
-        case "ferry": color = "9999ff"; break;
-        case "train": color = "ff3333"; break;
+        case "walk": color = "8dd2ff"; break;
+        case "tram": color = "5ee764"; break;
+        case "metro": color = "ff9c42"; break;
+        case "ferry": color = "69e6ff"; break;
+        case "train": color = "ff7d61"; break;
         // bus
-        default: color = "3333ff";
+        default: color = "5a65cc";
       }
     }
     return color;
@@ -79,8 +79,8 @@ $(document).ready(function(){
     polyline = new google.maps.Polyline({
         path: path,
         strokeColor: color,
-        strokeOpacity: 0.8,
-        strokeWeight: 6,
+        strokeOpacity: 0.9,
+        strokeWeight: 5,
         clickable: false
       });
     polyline.setMap(map);
