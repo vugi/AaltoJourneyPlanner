@@ -2,18 +2,21 @@ $(document).ready(function(){
   console.log("Hello World from app.js");
   
   initializeMap();
+  initializeSwitches();
   getRoute();
   
   var map;
   var startMarker;
   var endMarker;
+  var otherMarkers;
   var polyline;
-  var legLinesAndMarkers = [];
-  
+  var legLinesAndMarkers;
+
   function initializeMap() {
-    var latlng = new google.maps.LatLng(60.18,24.89);
+    var c = config.locs.mapcenter;
+    var latlng = new google.maps.LatLng(c.lat,c.lng);
     var myOptions = {
-      zoom: 13,
+      zoom: 12,
       center: latlng,
       mapTypeId: google.maps.MapTypeId.ROADMAP
     };
@@ -21,16 +24,26 @@ $(document).ready(function(){
     myOptions);
 
     var startDefaultLatLng = new google.maps.LatLng(60.1885493977,24.8339133406);
+    var endDefaultLatLng = new google.maps.LatLng(60.17173291474175,24.92356349471379);
+
+    // Get start and end from config, if available
+    $.each(config.locs, function(i, loc){
+      if ("start" in loc) {
+        startDefaultLatLng = new google.maps.LatLng(loc.lat,loc.lng);
+      } else if ("end" in loc) {
+        endDefaultLatLng = new google.maps.LatLng(loc.lat,loc.lng);
+      }
+    });
+
     startMarker = new google.maps.Marker({
       position: startDefaultLatLng,
-      draggable: true,
+      draggable: false,
       title: "Start",
       icon: "https://chart.googleapis.com/chart?chst=d_map_spin&chld=1|0|00ff00|12|b|Start"
     });
     startMarker.setMap(map);
-    google.maps.event.addListener(startMarker, 'mouseup', getRoute);
-    
-    var endDefaultLatLng = new google.maps.LatLng(60.17173291474175,24.92356349471379);
+    //google.maps.event.addListener(startMarker, 'mouseup', getRoute);
+
     endMarker = new google.maps.Marker({
       position: endDefaultLatLng,
       draggable: true,
@@ -40,6 +53,48 @@ $(document).ready(function(){
     endMarker.setMap(map);
     google.maps.event.addListener(endMarker, 'mouseup', getRoute);
 
+    otherMarkers = [];
+    $.each(config.locs, function(i, loc){
+      if (!("nomap" in loc)) {
+        console.log('other location:'+config.locs[i].title);
+        var latLng = new google.maps.LatLng(loc.lat, loc.lng);
+
+        var marker = new google.maps.Marker({
+          position: latLng,
+          draggable: false,
+          title: loc.title,
+          zIndex: 0,
+          icon: "https://chart.googleapis.com/chart?chst=d_map_spin&chld=1|0|ffffff|9|b|"+loc.title
+        });
+        marker.setMap(map);
+        google.maps.event.addListener(marker, 'mouseup',
+          function() {
+            endMarker.setPosition(latLng);
+            getRoute();
+          }
+        );
+
+        otherMarkers.push(marker);
+      }
+    });
+
+    legLinesAndMarkers = [];
+  }
+
+  function initializeSwitches() {
+    var switches = $('<div id="map_switches"></div>');
+    switches.append('<a id="switch-toggle-other-markers">Campus markers</a>');
+    $("#map_canvas").append(switches);
+    $("#switch-toggle-other-markers").click(function(){
+      $.each(otherMarkers, function(i, marker){
+        marker.setVisible(!marker.getVisible());
+        if(marker.getVisible() === true) {
+          $("#switch-toggle-other-markers").removeClass("off");
+        } else {
+          $("#switch-toggle-other-markers").addClass("off");
+        }
+      });
+    });
   }
 
   function getTransportHex(type, variant) {
@@ -163,17 +218,17 @@ $(document).ready(function(){
 
     var fromLatLng = startMarker.getPosition()
     var from = fromLatLng.lng() + "," + fromLatLng.lat()
-    console.log("from:"+from)
+    //console.log("from:"+from)
     
     var toLatLng = endMarker.getPosition()
     var to = toLatLng.lng() + "," + toLatLng.lat()
-    console.log("to:"+to)
+    //console.log("to:"+to)
 
     var params = "?request=route&from="+from+"&to="+to+"&format=json&epsg_in=wgs84&epsg_out=wgs84"
     var account = "&user="+config.user+"&pass="+config.pass
 
     $.getJSON(config.api+params+account, function(data){
-      console.log(data);
+      //console.log(data);
       $.each(data, function(i,val){
         var route = val[0];
         var routePath= []

@@ -17,7 +17,25 @@ h1 {
 #map_canvas {
   width:80%;
   height:100%;
+  position: relative;
 }
+#map_switches {
+  position: absolute;
+  z-index: 10000000000;
+  top: 0;
+  right: 0;
+  background: #fff;
+  box-shadow: -1px 1px 5px rgba(0,0,0, .5);
+}
+#map_switches a {
+  padding: 10px;
+  display: block;
+  color: green;
+}
+#map_switches a.off {
+  color: silver;
+}
+
 #results {
   width: 20%;
   position: absolute;
