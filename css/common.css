@@ -46,7 +46,7 @@ h1 {
   background-image: url(../images/switch-off.png);
 }
 
-#results {
+#sidebar {
   width: 25%;
   position: absolute;
   right: 0;

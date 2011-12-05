@@ -2,6 +2,7 @@ $(document).ready(function(){
   console.log("Hello World from app.js");
   
   initializeMap();
+  initializeTimeSelector();
   initializeSwitches();
   getRoute();
   
@@ -10,6 +11,22 @@ $(document).ready(function(){
   var endMarker;
   var otherMarkers;
   var polyline;
+  var legLinesAndMarkers;
+  
+  function initializeTimeSelector(){
+    var now = new Date();
+    //$('#time').val(now.getHours()+":"+now.getMinutes())
+    $('#time').scroller({ 
+    	preset: 'time', 
+    	ampm: false, 
+    	timeFormat: 'HH:ii',
+    	onSelect: function(){
+      		getRoute()
+    	}
+    });
+    $('#time').scroller('setDate', new Date(), true);
+  }
+  
   var legLinesAndMarkers;
 
   function initializeMap() {
@@ -239,8 +256,10 @@ $(document).ready(function(){
     var toLatLng = endMarker.getPosition()
     var to = toLatLng.lng() + "," + toLatLng.lat()
     //console.log("to:"+to)
+   
+    var time = $("#time").val().replace(":","");
 
-    var params = "?request=route&from="+from+"&to="+to+"&format=json&epsg_in=wgs84&epsg_out=wgs84"
+    var params = "?request=route&from="+from+"&to="+to+"&time="+time+"&format=json&epsg_in=wgs84&epsg_out=wgs84"
     var account = "&user="+config.user+"&pass="+config.pass
 
     $.getJSON(config.api+params+account, function(data){
