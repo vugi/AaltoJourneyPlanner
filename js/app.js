@@ -64,8 +64,8 @@ $(document).ready(function(){
     startMarker.setMap(map);
     //google.maps.event.addListener(startMarker, 'mouseup', getRoute);
 
-    //var endIcon = new google.maps.MarkerImage("images/goal.png",null,null,new google.maps.Point(20,20));
-    var endIcon = "https://chart.googleapis.com/chart?chst=d_map_spin&chld=0.8|0|c00|14|_|";
+    var endIcon = new google.maps.MarkerImage("images/goal.png",null,null,new google.maps.Point(17,52));
+    //var endIcon = "https://chart.googleapis.com/chart?chst=d_map_spin&chld=0.8|0|c00|14|_|";
     endMarker = new google.maps.Marker({
       position: endDefaultLatLng,
       draggable: true,
@@ -107,14 +107,42 @@ $(document).ready(function(){
     });
 
     legLinesAndMarkers = [];
+
+    function LongClick(map, length) {
+      this._length = length;
+      var me = this;
+      me._map = map;
+      google.maps.event.addListener(map, 'mousedown', function(e) { me._onMouseDown(e) });
+      google.maps.event.addListener(map, 'mouseup', function(e) { me._onMouseUp(e) });
+    }
+    LongClick.prototype._onMouseUp = function(e) {
+      var now = +new Date;
+      if (now - this._down > this._length) {
+        if (Math.abs(e.pixel.x - this._x) < config.longPressThreshold
+            && Math.abs(e.pixel.y - this._y) < config.longPressThreshold) {
+          google.maps.event.trigger(this._map, 'longpress', e);
+        }
+      }
+    }
+    LongClick.prototype._onMouseDown = function(e) {
+      this._down = +new Date;
+      this._x = e.pixel.x;
+      this._y = e.pixel.y;
+    }
+    new LongClick(map, 300);
+    google.maps.event.addListener(map, 'longpress', function(e) {
+      console.log(e.latLng);
+      endMarker.setPosition(e.latLng);
+      getRoute();
+    });
   }
 
   function initializeSwitches() {
     var switches = $('<div id="map_switches"></div>');
     switches.append('<a id="switch-toggle-other-markers" href="javascript:;">'
-        +'Campus markers</a>'
-        +'<a id="switch-toggle-your-position" href="javascript:;">'
-        +'Your position</a>');
+        +'Campus markers</a>');
+    /*switches.append('<a id="switch-toggle-your-position" href="javascript:;">'
+        +'Your position</a>');*/
     $("#map_canvas").append(switches);
     $("#switch-toggle-other-markers").click(function(){
       var isOff = $(this).hasClass("off");
@@ -127,7 +155,7 @@ $(document).ready(function(){
         }
       });
     });
-    $("#switch-toggle-your-position").click(function(){
+    /*$("#switch-toggle-your-position").click(function(){
       var isOff = $(this).hasClass("off");
       startMarker.setVisible(isOff);
       if(isOff) {
@@ -135,7 +163,7 @@ $(document).ready(function(){
       } else {
         $("#switch-toggle-your-position").addClass("off");
       }
-    });
+    });*/
   }
 
   function getTransportHex(type, variant) {
