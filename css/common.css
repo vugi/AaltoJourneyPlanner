@@ -15,12 +15,16 @@ h1 {
   font-size: 36px;
 }
 #map_canvas {
-  width:80%;
+  width:75%;
   height:100%;
   position: relative;
 }
 #map_switches {
   position: absolute;
+  /*
+  Need to make sure they're on top of the map,
+  which has z-indexes of hundred(s) thousand(s). :)
+  */
   z-index: 10000000000;
   top: 0;
   right: 0;
@@ -28,16 +32,22 @@ h1 {
   box-shadow: -1px 1px 5px rgba(0,0,0, .5);
 }
 #map_switches a {
-  padding: 10px;
+  padding: 10px 10px 10px 30px;
   display: block;
-  color: green;
+  color: #008000;
+  text-decoration: none;
+  background: url(../images/switch-on.png) 10px 50% no-repeat;
+  border: 1px solid #ccc;
+  border-top-width: 0;
+  border-right-width: 0;
 }
 #map_switches a.off {
-  color: silver;
+  color: #ccc;
+  background-image: url(../images/switch-off.png);
 }
 
 #results {
-  width: 20%;
+  width: 25%;
   position: absolute;
   right: 0;
   top: 0;
@@ -64,3 +74,24 @@ h1 {
   background-color: #cfc;
   box-shadow: 1px 1px 5px rgba(0,0,0, .5);
 }
+.result h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: normal;
+}
+.result ol {
+  margin: 10px 0;
+  padding-left: 5px;
+  list-style: none;
+}
+.result li {
+  margin-bottom: 4px;
+}
+
+.result .time {
+  color: #333;
+}
+.result .type {
+  font-weight: bold
+}
+

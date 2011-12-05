@@ -83,12 +83,14 @@ $(document).ready(function(){
 
   function initializeSwitches() {
     var switches = $('<div id="map_switches"></div>');
-    switches.append('<a id="switch-toggle-other-markers">Campus markers</a>');
+    switches.append('<a id="switch-toggle-other-markers" href="javascript:;">'
+        +'Campus markers</a>');
     $("#map_canvas").append(switches);
     $("#switch-toggle-other-markers").click(function(){
+      var isOff = $(this).hasClass("off");
       $.each(otherMarkers, function(i, marker){
-        marker.setVisible(!marker.getVisible());
-        if(marker.getVisible() === true) {
+        marker.setVisible(isOff);
+        if(isOff) {
           $("#switch-toggle-other-markers").removeClass("off");
         } else {
           $("#switch-toggle-other-markers").addClass("off");
@@ -242,16 +244,28 @@ $(document).ready(function(){
           var legItem = $("<li></li>").appendTo(legs)
           
           var time = leg.locs[0].depTime;
-          legItem.append(time.substr(8,2)+":"+time.substr(10,2)+" ");
-          
+          legItem.append("<span class='time'>"+time.substr(8,2)+":"+time.substr(10,2)+"</span> ");
+
           var type = getLegTypeString(leg.type)
-          legItem.append(type + " ");
+          legItem.append("<span class='type'>"+type+"</span> ");
 
           if(type === "walk"){
              legItem.append(leg.length + "m ");
           } else {
-            /*legItem.append(leg.code.substr(1,4))*/
-            legItem.append(formatVehicleCode(leg.code,type));
+            legItem.append("<span class='type'>" + formatVehicleCode(leg.code,type) + "</span> ");
+
+            var startEndString = "<br>";
+            if (leg.locs[0].name)
+                startEndString += leg.locs[0].name;
+            else
+                startEndString += "???";
+            startEndString += " &ndash; ";
+            if (leg.locs[leg.locs.length-1].name)
+                startEndString += leg.locs[leg.locs.length-1].name
+            else
+                startEndString += "???";
+
+            legItem.append(startEndString);
           }
 
 
