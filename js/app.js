@@ -35,11 +35,14 @@ $(document).ready(function(){
       }
     });
 
+
+    var startIcon = new google.maps.MarkerImage("images/your-position-small.png",null,null,new google.maps.Point(10,10));
+    console.log(startIcon);
     startMarker = new google.maps.Marker({
       position: startDefaultLatLng,
       draggable: false,
       title: "Start",
-      icon: "https://chart.googleapis.com/chart?chst=d_map_spin&chld=1|0|00ff00|12|b|Start"
+      icon: startIcon
     });
     startMarker.setMap(map);
     //google.maps.event.addListener(startMarker, 'mouseup', getRoute);
@@ -84,7 +87,9 @@ $(document).ready(function(){
   function initializeSwitches() {
     var switches = $('<div id="map_switches"></div>');
     switches.append('<a id="switch-toggle-other-markers" href="javascript:;">'
-        +'Campus markers</a>');
+        +'Campus markers</a>'
+        +'<a id="switch-toggle-your-position" href="javascript:;">'
+        +'Your position</a>');
     $("#map_canvas").append(switches);
     $("#switch-toggle-other-markers").click(function(){
       var isOff = $(this).hasClass("off");
@@ -96,6 +101,15 @@ $(document).ready(function(){
           $("#switch-toggle-other-markers").addClass("off");
         }
       });
+    });
+    $("#switch-toggle-your-position").click(function(){
+      var isOff = $(this).hasClass("off");
+      startMarker.setVisible(isOff);
+      if(isOff) {
+        $("#switch-toggle-your-position").removeClass("off");
+      } else {
+        $("#switch-toggle-your-position").addClass("off");
+      }
     });
   }
 
@@ -234,9 +248,17 @@ $(document).ready(function(){
       $.each(data, function(i,val){
         var route = val[0];
         var routePath= []
-        
+
+        console.log(route);
         var result = $("<div class='result'></div>");
-        result.append("<h3>Route "+(i+1)+"</h3>");
+        result.append("<h3>"+(i+1)+"</h3>");
+        var startTime = route.legs[0].locs[0].depTime;
+        var endTime = route.legs[route.legs.length-1].locs[route.legs[route.legs.length-1].locs.length-1].arrTime;
+        result.append("<h4>"
+            +startTime.substr(8,2)+":"+startTime.substr(10,2)
+            +" &ndash; "
+            +endTime.substr(8,2)+":"+endTime.substr(10,2)
+            +"</h4>");
 
         var legs = $("<ol></ol>").appendTo(result)
         
@@ -250,11 +272,11 @@ $(document).ready(function(){
           legItem.append("<span class='type'>"+type+"</span> ");
 
           if(type === "walk"){
-             legItem.append(leg.length + "m ");
+             legItem.append("<span class='meters'>"+leg.length + "m</span>");
           } else {
             legItem.append("<span class='type'>" + formatVehicleCode(leg.code,type) + "</span> ");
 
-            var startEndString = "<br>";
+            var startEndString = "<span class='places'>";
             if (leg.locs[0].name)
                 startEndString += leg.locs[0].name;
             else
@@ -264,6 +286,7 @@ $(document).ready(function(){
                 startEndString += leg.locs[leg.locs.length-1].name
             else
                 startEndString += "???";
+            startEndString += "</span>";
 
             legItem.append(startEndString);
           }

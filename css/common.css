@@ -58,13 +58,14 @@ h1 {
   box-shadow: -1px -1px 10px rgba(0,0,0, .5);
 }
 .result {
-  padding: 20px;
+  padding: 10px;
   margin: 5px;
   border-radius: 2px;
   box-shadow: 1px 1px 5px rgba(0,0,0, .2);
   -webkit-transition: all .3s ease-in-out;
   -moz-transition: all .3s ease-in-out;
   transition: all .3s ease-in-out;
+  position: relative;
 }
 .result:hover{
   background-color: #efe;
@@ -76,22 +77,52 @@ h1 {
 }
 .result h3 {
   margin: 0;
+  font-size: 22px;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  font-weight: bold;
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: #fff;
+  background: #363;
+  border-top-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+.result h4 {
+  padding-left: 30px;
+  margin: -2px 0 10px;
   font-size: 18px;
   font-weight: normal;
 }
+
 .result ol {
   margin: 10px 0;
-  padding-left: 5px;
+  padding: 0;
   list-style: none;
 }
 .result li {
   margin-bottom: 4px;
+  color: #333;
 }
 
 .result .time {
-  color: #333;
+  width: 50px;
+  display: block;
+  float: left;
 }
 .result .type {
-  font-weight: bold
+  color: #000;
+  font-weight: bold;
+}
+.result .meters {
+
+}
+
+.result .places {
+  padding-left: 50px;
+  display: block;
 }
 
