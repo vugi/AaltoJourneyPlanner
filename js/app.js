@@ -3,13 +3,15 @@ $(document).ready(function(){
   
   initializeMap();
   initializeTimeSelector();
+  initializeSwitches();
   getRoute();
   
   var map;
   var startMarker;
   var endMarker;
+  var otherMarkers;
   var polyline;
-  var legLinesAndMarkers = [];
+  var legLinesAndMarkers;
   
   function initializeTimeSelector(){
     var now = new Date();
@@ -25,10 +27,13 @@ $(document).ready(function(){
     $('#time').scroller('setDate', new Date(), true);
   }
   
+  var legLinesAndMarkers;
+
   function initializeMap() {
-    var latlng = new google.maps.LatLng(60.18,24.89);
+    var c = config.locs.mapcenter;
+    var latlng = new google.maps.LatLng(c.lat,c.lng);
     var myOptions = {
-      zoom: 13,
+      zoom: 12,
       center: latlng,
       mapTypeId: google.maps.MapTypeId.ROADMAP
     };
@@ -36,16 +41,26 @@ $(document).ready(function(){
     myOptions);
 
     var startDefaultLatLng = new google.maps.LatLng(60.1885493977,24.8339133406);
+    var endDefaultLatLng = new google.maps.LatLng(60.17173291474175,24.92356349471379);
+
+    // Get start and end from config, if available
+    $.each(config.locs, function(i, loc){
+      if ("start" in loc) {
+        startDefaultLatLng = new google.maps.LatLng(loc.lat,loc.lng);
+      } else if ("end" in loc) {
+        endDefaultLatLng = new google.maps.LatLng(loc.lat,loc.lng);
+      }
+    });
+
     startMarker = new google.maps.Marker({
       position: startDefaultLatLng,
-      draggable: true,
+      draggable: false,
       title: "Start",
       icon: "https://chart.googleapis.com/chart?chst=d_map_spin&chld=1|0|00ff00|12|b|Start"
     });
     startMarker.setMap(map);
-    google.maps.event.addListener(startMarker, 'mouseup', getRoute);
-    
-    var endDefaultLatLng = new google.maps.LatLng(60.17173291474175,24.92356349471379);
+    //google.maps.event.addListener(startMarker, 'mouseup', getRoute);
+
     endMarker = new google.maps.Marker({
       position: endDefaultLatLng,
       draggable: true,
@@ -55,6 +70,76 @@ $(document).ready(function(){
     endMarker.setMap(map);
     google.maps.event.addListener(endMarker, 'mouseup', getRoute);
 
+    otherMarkers = [];
+    $.each(config.locs, function(i, loc){
+      if (!("nomap" in loc)) {
+        console.log('other location:'+config.locs[i].title);
+        var latLng = new google.maps.LatLng(loc.lat, loc.lng);
+
+        var marker = new google.maps.Marker({
+          position: latLng,
+          draggable: false,
+          title: loc.title,
+          zIndex: 0,
+          icon: "https://chart.googleapis.com/chart?chst=d_map_spin&chld=1|0|ffffff|9|b|"+loc.title
+        });
+        marker.setMap(map);
+        google.maps.event.addListener(marker, 'mouseup',
+          function() {
+            endMarker.setPosition(latLng);
+            getRoute();
+          }
+        );
+
+        otherMarkers.push(marker);
+      }
+    });
+
+    legLinesAndMarkers = [];
+  }
+
+  function initializeSwitches() {
+    var switches = $('<div id="map_switches"></div>');
+    switches.append('<a id="switch-toggle-other-markers" href="javascript:;">'
+        +'Campus markers</a>');
+    $("#map_canvas").append(switches);
+    $("#switch-toggle-other-markers").click(function(){
+      var isOff = $(this).hasClass("off");
+      $.each(otherMarkers, function(i, marker){
+        marker.setVisible(isOff);
+        if(isOff) {
+          $("#switch-toggle-other-markers").removeClass("off");
+        } else {
+          $("#switch-toggle-other-markers").addClass("off");
+        }
+      });
+    });
+  }
+
+  function getTransportHex(type, variant) {
+    color = "";
+    switch(type) {
+      case "walk": color = "499bff"; break;
+      case "tram": color = "00ae2e"; break;
+      case "metro": color = "fb6500"; break;
+      case "ferry": color = "00aee7"; break;
+      case "train": color = "e9001a"; break;
+      // bus
+      default: color = "193695";
+    }
+
+    if (variant === "light") {
+      switch(type) {
+        case "walk": color = "8dd2ff"; break;
+        case "tram": color = "5ee764"; break;
+        case "metro": color = "ff9c42"; break;
+        case "ferry": color = "69e6ff"; break;
+        case "train": color = "ff7d61"; break;
+        // bus
+        default: color = "5a65cc";
+      }
+    }
+    return color;
   }
 
   function createPolyline(path, transportTypeString) {
@@ -63,34 +148,27 @@ $(document).ready(function(){
       console.log("No path!");
     }
 
-    var color = "#666666";
-
-    switch(transportTypeString) {
-      case "walk": color = "#666666"; break;
-      case "tram": color = "#009933"; break;
-      case "metro": color = "#FF6600"; break;
-      case "ferry": color = "#0000FF"; break;
-      case "train": color = "#FF0000"; break;
-      // bus
-      default: color = "#0000CC";
-    }
+    var color = "#"+getTransportHex(transportTypeString);
 
     polyline = new google.maps.Polyline({
         path: path,
         strokeColor: color,
-        strokeOpacity: 0.6,
-        strokeWeight: 6
+        strokeOpacity: 0.9,
+        strokeWeight: 5,
+        clickable: false
       });
     polyline.setMap(map);
 
     return polyline;
   }
-  function createMarker(LatLng, vehicle) {
+  function createMarker(LatLng, vehicle, type) {
+    var color = getTransportHex(type, 'light');
+
     var marker = new google.maps.Marker({
       position: LatLng,
       draggable: false,
       title: vehicle+"",
-      icon: "https://chart.googleapis.com/chart?chst=d_map_spin&chld=1|0|cccccc|11|b|"+vehicle+""
+      icon: "https://chart.googleapis.com/chart?chst=d_map_spin&chld=1|0|"+color+"|11|b|"+vehicle
     });
     marker.setMap(map);
     return marker;
@@ -112,9 +190,9 @@ $(document).ready(function(){
       var type = getLegTypeString(leg.type);
       var marker = null;
       if (type !== "walk") {
-        var vehicleNumber = formatVehicleCode(leg.code,true);
+        var vehicleNumber = formatVehicleCode(leg.code,type);
         marker = createMarker(
-          new google.maps.LatLng(leg.locs[0].coord.y,leg.locs[0].coord.x), vehicleNumber
+          new google.maps.LatLng(leg.locs[0].coord.y,leg.locs[0].coord.x), vehicleNumber, type
         );
       }
       var path = [];
@@ -127,18 +205,25 @@ $(document).ready(function(){
     }
   }
 
-  function formatVehicleCode(code, forPin) {
-    if (forPin) {
-      return parseInt(code.substring(1,6));
-    }
+  function formatVehicleCode(code,type) {
+    //console.log('code:'+code);
     var vehicleString = "";
-    var type = code.substring(0,1);
-    if (type === "1" || type === "2" || type === "4" || type === "5")
-        vehicleString = "Bus";
-    else if (type === "3")
-        vehicleString = "Train";
-
-    vehicleString += " " + parseInt(code.substring(1,6));
+    if (type === "train") {
+      vehicleString = code.substring(4,5);
+    } else if (type === "metro") {
+      vehicleString = "metro";
+    } else {
+      vehicleString = code.substring(1,6).trim();
+      var leadingZeros = 0;
+      for (var i in vehicleString) {
+        if(vehicleString[i] === "0") {
+          leadingZeros++;
+        } else {
+          break;
+        }
+      }
+      vehicleString = vehicleString.substring(leadingZeros);
+    }
 
     return vehicleString;
   }
@@ -152,19 +237,19 @@ $(document).ready(function(){
 
     var fromLatLng = startMarker.getPosition()
     var from = fromLatLng.lng() + "," + fromLatLng.lat()
-    console.log("from:"+from)
+    //console.log("from:"+from)
     
     var toLatLng = endMarker.getPosition()
     var to = toLatLng.lng() + "," + toLatLng.lat()
-    console.log("to:"+to)
-    
+    //console.log("to:"+to)
+   
     var time = $("#time").val().replace(":","");
 
     var params = "?request=route&from="+from+"&to="+to+"&time="+time+"&format=json&epsg_in=wgs84&epsg_out=wgs84"
     var account = "&user="+config.user+"&pass="+config.pass
 
     $.getJSON(config.api+params+account, function(data){
-      console.log(data);
+      //console.log(data);
       $.each(data, function(i,val){
         var route = val[0];
         var routePath= []
@@ -178,16 +263,28 @@ $(document).ready(function(){
           var legItem = $("<li></li>").appendTo(legs)
           
           var time = leg.locs[0].depTime;
-          legItem.append(time.substr(8,2)+":"+time.substr(10,2)+" ");
-          
+          legItem.append("<span class='time'>"+time.substr(8,2)+":"+time.substr(10,2)+"</span> ");
+
           var type = getLegTypeString(leg.type)
-          legItem.append(type + " ");
+          legItem.append("<span class='type'>"+type+"</span> ");
 
           if(type === "walk"){
              legItem.append(leg.length + "m ");
           } else {
-            /*legItem.append(leg.code.substr(1,4))*/
-            legItem.append(formatVehicleCode(leg.code));
+            legItem.append("<span class='type'>" + formatVehicleCode(leg.code,type) + "</span> ");
+
+            var startEndString = "<br>";
+            if (leg.locs[0].name)
+                startEndString += leg.locs[0].name;
+            else
+                startEndString += "???";
+            startEndString += " &ndash; ";
+            if (leg.locs[leg.locs.length-1].name)
+                startEndString += leg.locs[leg.locs.length-1].name
+            else
+                startEndString += "???";
+
+            legItem.append(startEndString);
           }
 
 
