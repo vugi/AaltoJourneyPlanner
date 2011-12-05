@@ -21,10 +21,19 @@ $(document).ready(function(){
     	ampm: false, 
     	timeFormat: 'HH:ii',
     	onSelect: function(){
+    		$("#now").removeClass("selected");
       		getRoute()
     	}
     });
+    $('#now').click(function(){
+    	setTimeNow();
+    })
+    setTimeNow();
+  }
+  
+  function setTimeNow(){
     $('#time').scroller('setDate', new Date(), true);
+  	$("#now").addClass("selected");
   }
   
   var legLinesAndMarkers;

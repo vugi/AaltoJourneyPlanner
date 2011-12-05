@@ -57,29 +57,51 @@ h1 {
   background: white;
   box-shadow: -1px -1px 10px rgba(0,0,0, .5);
 }
-#timefield label {
+#timefield {
   display: block;
   padding: 5px 10px;
   background: #efe;
   box-shadow: 1px 1px 5px rgba(0,0,0, .4);
   margin-bottom: 20px;
-  overflow: hidden;
   line-height: 30px;
-  height: 30px;
   font-weight: bold;
 }
+#timefield label {
+}
 #timefield input {
-  display: block;
-  height: 25px;
-  line-height: 25px;
-  width: 50%;
-  float: right;
-  font-size: 22px;
+  display: inline-block;
+  vertical-align: bottom;
+  height: 30px;
+  line-height: 30px;
+  width: 65%;
+  font-size: 25px;
   text-align: center;
   border: 0px solid rgba(0,0,0, .2);
   background: rgba(255,255,255, .9);
   font-weight: normal;
   box-shadow: inset 1px 1px 8px rgba(0,0,0, .4);
+  margin: 0;
+}
+#timefield a#now {
+  display: inline-block;
+  vertical-align: bottom;
+  height: 30px;
+  line-height: 30px;
+  padding: 0 10px 0 30px;
+  margin: 0;
+  text-decoration: none;
+  color: #ccc;
+  background: #ffffff url(../images/switch-off.png) 10px 50% no-repeat;
+  border: 1px solid #ccc;
+  border-top-width: 0;
+  border-right-width: 0;
+  margin: 0;
+}
+#timefield a#now.selected {
+  color: #008000;
+  background-image: url(../images/switch-on.png);
+  background-color: transparent;
+  border-color: transparent;
 }
 
 .result {
