@@ -98,7 +98,7 @@ $(document).ready(function(){
     //google.maps.event.addListener(startMarker, 'mouseup', getRoute);
 
     if (endDefaultLatLng) {
-      addEndMarker(endDefaultLatLng);
+      routeTo(endDefaultLatLng);
     }
 
     otherMarkers = [];
@@ -154,10 +154,8 @@ $(document).ready(function(){
       this._y = e.pixel.y;
     }
     new LongClick(map, 300);
-    google.maps.event.addListener(map, 'longpress', function(e) {
-      console.log(e.latLng);
-      routeTo(e.latLng);
-    });
+    google.maps.event.addListener(map, 'longpress', function(e) { routeTo(e.latLng); });
+    google.maps.event.addListener(map, 'rightclick', function(e) { routeTo(e.latLng); });
   }
 
   function routeTo(latLng) {
@@ -173,7 +171,6 @@ $(document).ready(function(){
     endMarker = new google.maps.Marker({
       position: latLng,
       draggable: true,
-      title: "End",
       icon: endIcon
     });
     endMarker.setMap(map);
