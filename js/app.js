@@ -3,8 +3,6 @@ $(document).ready(function(){
   
   initializeMap();
   initializeTimeSelector();
-  initializeSwitches();
-  getRoute();
   
   var map;
   var startMarker;
@@ -12,13 +10,13 @@ $(document).ready(function(){
   var otherMarkers;
   var polyline;
   var legLinesAndMarkers;
-  
+
   function initializeTimeSelector(){
     var now = new Date();
     //$('#time').val(now.getHours()+":"+now.getMinutes())
-    $('#time').scroller({ 
-    	preset: 'time', 
-    	ampm: false, 
+    $('#time').scroller({
+    	preset: 'time',
+    	ampm: false,
     	timeFormat: 'HH:ii',
     	onSelect: function(){
     		$("#now").removeClass("selected");
@@ -35,13 +33,13 @@ $(document).ready(function(){
     $('#time').scroller('setDate', new Date(), true);
   	$("#now").addClass("selected");
   }
-  
+
   var legLinesAndMarkers;
 
   function initializeMap() {
     var c = config.locs.mapcenter;
     var latlng = new google.maps.LatLng(c.lat,c.lng);
-    
+
 	var customMapType = new google.maps.StyledMapType([
 	  {
 		stylers: [
@@ -75,7 +73,7 @@ $(document).ready(function(){
     map.setMapTypeId('custom');
 
     var startDefaultLatLng = new google.maps.LatLng(60.1885493977,24.8339133406);
-    var endDefaultLatLng = new google.maps.LatLng(60.17173291474175,24.92356349471379);
+    var endDefaultLatLng = null;
 
     // Get start and end from config, if available
     $.each(config.locs, function(i, loc){
@@ -98,17 +96,9 @@ $(document).ready(function(){
     startMarker.setMap(map);
     //google.maps.event.addListener(startMarker, 'mouseup', getRoute);
 
-    var endIcon = new google.maps.MarkerImage("images/goal.png",null,null,new google.maps.Point(17,52));
-    //var endIcon = "https://chart.googleapis.com/chart?chst=d_map_spin&chld=0.8|0|c00|14|_|";
-    endMarker = new google.maps.Marker({
-      position: endDefaultLatLng,
-      draggable: true,
-      title: "End",
-      shape: "circle",
-      icon: endIcon
-    });
-    endMarker.setMap(map);
-    google.maps.event.addListener(endMarker, 'mouseup', getRoute);
+    if (endDefaultLatLng) {
+      addEndMarker(endDefaultLatLng);
+    }
 
     otherMarkers = [];
     $.each(config.locs, function(i, loc){
@@ -131,8 +121,7 @@ $(document).ready(function(){
         marker.setMap(map);
         google.maps.event.addListener(marker, 'mouseup',
           function() {
-            endMarker.setPosition(latLng);
-            getRoute();
+            routeTo(latLng);
           }
         );
 
@@ -166,9 +155,28 @@ $(document).ready(function(){
     new LongClick(map, 300);
     google.maps.event.addListener(map, 'longpress', function(e) {
       console.log(e.latLng);
-      endMarker.setPosition(e.latLng);
-      getRoute();
+      routeTo(e.latLng);
     });
+  }
+
+  function routeTo(latLng) {
+    if (!endMarker)
+      addEndMarker(latLng);
+
+    endMarker.setPosition(latLng);
+    getRoute();
+  }
+
+  function addEndMarker(latLng) {
+    var endIcon = new google.maps.MarkerImage("images/goal.png",null,null,new google.maps.Point(17,52));
+    endMarker = new google.maps.Marker({
+      position: latLng,
+      draggable: true,
+      title: "End",
+      icon: endIcon
+    });
+    endMarker.setMap(map);
+    google.maps.event.addListener(endMarker, 'mouseup', getRoute);
   }
 
   function initializeSwitches() {
@@ -345,78 +353,84 @@ $(document).ready(function(){
     var account = "&user="+config.user+"&pass="+config.pass
 
     $.getJSON(config.api+params+account, function(data){
-      //console.log(data);
-      $.each(data, function(i,val){
-        var route = val[0];
-        var routePath= []
+      console.log(data);
+      if (data && data[0]) {
+        $.each(data, function(i,val){
+          var route = val[0];
+          var routePath= []
 
-        console.log(route);
-        var result = $("<div class='result'></div>");
-        result.append("<h3>"+(i+1)+"</h3>");
-        var startTime = route.legs[0].locs[0].depTime;
-        var endTime = route.legs[route.legs.length-1].locs[route.legs[route.legs.length-1].locs.length-1].arrTime;
-        result.append("<h4>"
-            +startTime.substr(8,2)+":"+startTime.substr(10,2)
-            +"&ndash;"
-            +endTime.substr(8,2)+":"+endTime.substr(10,2)
-            +" ("+route.duration/60 + " mins)"
-            +"</h4>");
+          console.log(route);
+          var result = $("<div class='result'></div>");
+          //if ()
+          result.append("<h3>"+(i+1)+"</h3>");
+          var startTime = route.legs[0].locs[0].depTime;
+          var endTime = route.legs[route.legs.length-1].locs[route.legs[route.legs.length-1].locs.length-1].arrTime;
+          result.append("<h4>"
+              +startTime.substr(8,2)+":"+startTime.substr(10,2)
+              +"&ndash;"
+              +endTime.substr(8,2)+":"+endTime.substr(10,2)
+              +" ("+route.duration/60 + " mins)"
+              +"</h4>");
 
-        var legs = $("<ol></ol>").appendTo(result)
-        
-        $.each(route.legs, function(i,leg){
-          var legItem = $("<li></li>").appendTo(legs)
-          
-          var time = leg.locs[0].depTime;
-          legItem.append("<span class='time'>"+time.substr(8,2)+":"+time.substr(10,2)+"</span> ");
+          var legs = $("<ol></ol>").appendTo(result)
 
-          var type = getLegTypeString(leg.type)
-          legItem.append("<span class='type'>"+type+"</span> ");
+          $.each(route.legs, function(i,leg){
+            var legItem = $("<li></li>").appendTo(legs)
 
-          if(type === "walk"){
-             legItem.append("<span class='meters'>"+leg.length + " m</span>");
-          } else {
-            legItem.append("<span class='type'>" + formatVehicleCode(leg.code,type) + "</span> ");
+            var time = leg.locs[0].depTime;
+            legItem.append("<span class='time'>"+time.substr(8,2)+":"+time.substr(10,2)+"</span> ");
 
-            var startEndString = "<span class='places'>";
-            if (leg.locs[0].name)
-                startEndString += leg.locs[0].name;
-            else
-                startEndString += "???";
-            startEndString += " &ndash; ";
-            if (leg.locs[leg.locs.length-1].name)
-                startEndString += leg.locs[leg.locs.length-1].name
-            else
-                startEndString += "???";
-            startEndString += "</span>";
+            var type = getLegTypeString(leg.type)
+            legItem.append("<span class='type'>"+type+"</span> ");
 
-            legItem.append(startEndString);
-          }
+            if(type === "walk"){
+               legItem.append("<span class='meters'>"+leg.length + " m</span>");
+            } else {
+              legItem.append("<span class='type'>" + formatVehicleCode(leg.code,type) + "</span> ");
+
+              var startEndString = "<span class='places'>";
+              if (leg.locs[0].name)
+                  startEndString += leg.locs[0].name;
+              else
+                  startEndString += "???";
+              startEndString += " &ndash; ";
+              if (leg.locs[leg.locs.length-1].name)
+                  startEndString += leg.locs[leg.locs.length-1].name
+              else
+                  startEndString += "???";
+              startEndString += "</span>";
+
+              legItem.append(startEndString);
+            }
 
 
-          $.each(leg.locs,function(i,loc){
-            routePath.push(new google.maps.LatLng(loc.coord.y,loc.coord.x))
+            $.each(leg.locs,function(i,loc){
+              routePath.push(new google.maps.LatLng(loc.coord.y,loc.coord.x))
+            })
+          });
+
+          //result.append("Length: " + route.length + "m<br/>");
+          //result.append("Duration: " + route.duration/60 + " minutes");
+          $("#results").append(result);
+
+          // Show route on map when clicked
+          result.click(function(){
+            showRoute(route.legs);
+            $(".result").removeClass("selected")
+            result.addClass("selected")
           })
-        });
 
-        //result.append("Length: " + route.length + "m<br/>");
-        //result.append("Duration: " + route.duration/60 + " minutes");
-        $("#results").append(result);
-        
-        // Show route on map when clicked
-        result.click(function(){
-          showRoute(route.legs);
-          $(".result").removeClass("selected")
-          result.addClass("selected")
-        })
-        
-        // Show the first result immediately
-        if(i === 0){
-          showRoute(route.legs);
-          result.addClass("selected")
-        }
-      });
+          // Show the first result immediately
+          if(i === 0){
+            showRoute(route.legs);
+            result.addClass("selected")
+          }
+        });
+      } else {
+        $("#results").html("<h2>No routes!</h2>");
+      }
     });
+
   }
   
   function getLegTypeString(typeId){
