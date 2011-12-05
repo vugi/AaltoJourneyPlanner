@@ -62,8 +62,9 @@ $(document).ready(function(){
     var myOptions = {
       zoom: 12,
       center: latlng,
+      streetViewControl: false,
       mapTypeControlOptions: {
-      		mapTypeIds: [google.maps.MapTypeId.ROADMAP, google.maps.MapTypeId.SATELLITE, 'custom']
+      		mapTypeIds: [google.maps.MapTypeId.ROADMAP, google.maps.MapTypeId.HYBRID, 'custom']
     	}
     };
     map = new google.maps.Map(document.getElementById("map_canvas"),
