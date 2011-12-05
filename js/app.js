@@ -32,13 +32,38 @@ $(document).ready(function(){
   function initializeMap() {
     var c = config.locs.mapcenter;
     var latlng = new google.maps.LatLng(c.lat,c.lng);
+    
+	var customMapType = new google.maps.StyledMapType([
+	  {
+		stylers: [
+		  { gamma: 0.6 }
+		]
+	  },{
+		featureType: "road.highway",
+		elementType: "labels",
+		stylers: [
+		  { visibility: "off" }
+		]
+	  },{
+		featureType: "water",
+		stylers: [
+		  { lightness: -20 }
+		]
+	  }
+	], {name: "AaltoWindow style"});
+	
     var myOptions = {
       zoom: 12,
       center: latlng,
-      mapTypeId: google.maps.MapTypeId.ROADMAP
+      mapTypeControlOptions: {
+      		mapTypeIds: [google.maps.MapTypeId.ROADMAP, google.maps.MapTypeId.SATELLITE, 'custom']
+    	}
     };
     map = new google.maps.Map(document.getElementById("map_canvas"),
     myOptions);
+    
+    map.mapTypes.set('custom', customMapType);
+    map.setMapTypeId('custom');
 
     var startDefaultLatLng = new google.maps.LatLng(60.1885493977,24.8339133406);
     var endDefaultLatLng = new google.maps.LatLng(60.17173291474175,24.92356349471379);
