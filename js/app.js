@@ -332,6 +332,13 @@ $(document).ready(function(){
 
   function getRoute(){
     console.log("getRoute")
+    
+    if(!startMarker || !endMarker){
+    	return false;
+    }
+    
+    $("#loader").fadeIn();
+    
     // Clear current data
     $("#results").empty()
     //polyline.setPath([]);
@@ -351,6 +358,7 @@ $(document).ready(function(){
     var account = "&user="+config.user+"&pass="+config.pass
 
     $.getJSON(config.api+params+account, function(data){
+      $("#loader").fadeOut();
       console.log(data);
       if (data && data[0]) {
         $.each(data, function(i,val){
@@ -428,7 +436,6 @@ $(document).ready(function(){
         $("#results").html("<h2>No routes!</h2>");
       }
     });
-
   }
   
   function getLegTypeString(typeId){

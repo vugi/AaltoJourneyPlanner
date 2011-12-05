@@ -180,3 +180,38 @@ h1 {
   display: block;
 }
 
+/* Loader animation */
+#loader{
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	margin-left: -34.5px;
+	display: none;
+}
+.circle{
+	background-color:#CCC;
+	float:left;
+	height:15px;
+	margin-left:8px;
+	width:15px;
+	-webkit-animation-name: bounce_circle;
+	-webkit-border-radius:10px;
+ 	-webkit-animation-duration: 1.5s;
+ 	-webkit-animation-iteration-count: infinite;
+ 	-webkit-animation-direction: linear;
+	opacity:0.3;
+}
+#circle_1{
+ 	-webkit-animation-delay: .3s;
+ }
+#circle_2{
+ 	-webkit-animation-delay: .7s;
+}
+#circle_3{
+ 	-webkit-animation-delay: .9s;
+}
+@-webkit-keyframes bounce_circle{
+	0%{opacity:0.3;}
+	50%{opacity:1;background-color:#111}
+	100%{opacity:0.3;}
+}
