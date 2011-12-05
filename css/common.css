@@ -57,10 +57,34 @@ h1 {
   background: white;
   box-shadow: -1px -1px 10px rgba(0,0,0, .5);
 }
+#timefield label {
+  display: block;
+  padding: 5px 10px;
+  background: #efe;
+  box-shadow: 1px 1px 5px rgba(0,0,0, .4);
+  margin-bottom: 20px;
+  overflow: hidden;
+  line-height: 27px;
+  font-weight: bold;
+}
+#timefield input {
+  display: block;
+  height: 25px;
+  line-height: 25px;
+  width: 50%;
+  float: right;
+  font-size: 22px;
+  text-align: center;
+  border: 1px solid rgba(0,0,0, .2);
+  background: rgba(255,255,255, .9);
+  font-weight: normal;
+}
+
 .result {
   padding: 10px;
   margin: 5px;
-  border-radius: 2px;
+  border-top-left-radius: 3px;
+  border-bottom-right-radius: 3px;
   box-shadow: 1px 1px 5px rgba(0,0,0, .2);
   -webkit-transition: all .3s ease-in-out;
   -moz-transition: all .3s ease-in-out;

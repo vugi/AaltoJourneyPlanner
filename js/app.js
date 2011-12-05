@@ -64,11 +64,14 @@ $(document).ready(function(){
     startMarker.setMap(map);
     //google.maps.event.addListener(startMarker, 'mouseup', getRoute);
 
+    //var endIcon = new google.maps.MarkerImage("images/goal.png",null,null,new google.maps.Point(20,20));
+    var endIcon = "https://chart.googleapis.com/chart?chst=d_map_spin&chld=0.8|0|c00|14|_|";
     endMarker = new google.maps.Marker({
       position: endDefaultLatLng,
       draggable: true,
       title: "End",
-      icon: "https://chart.googleapis.com/chart?chst=d_map_spin&chld=1|0|ff0000|12|b|End"
+      shape: "circle",
+      icon: endIcon
     });
     endMarker.setMap(map);
     google.maps.event.addListener(endMarker, 'mouseup', getRoute);
@@ -79,12 +82,17 @@ $(document).ready(function(){
         console.log('other location:'+config.locs[i].title);
         var latLng = new google.maps.LatLng(loc.lat, loc.lng);
 
+        //old icon: "https://chart.googleapis.com/chart?chst=d_map_spin&chld=1|0|ffffff|9|b|"+loc.title
+        var icon = "https://chart.googleapis.com/chart?chst=d_simple_text_icon_below&chld="
+            +loc.title+"|14|fff|"
+            +"star|24|ffff00|333";
+
         var marker = new google.maps.Marker({
           position: latLng,
           draggable: false,
           title: loc.title,
           zIndex: 0,
-          icon: "https://chart.googleapis.com/chart?chst=d_map_spin&chld=1|0|ffffff|9|b|"+loc.title
+          icon: icon
         });
         marker.setMap(map);
         google.maps.event.addListener(marker, 'mouseup',
@@ -155,6 +163,14 @@ $(document).ready(function(){
     }
     return color;
   }
+  function getIconType(type) {
+    switch(type) {
+      case "tram": return "train";
+      case "metro": return "train";
+      case "ferry": return "ship";
+      default: return type;
+    }
+  }
 
   function createPolyline(path, transportTypeString) {
     if(!path) {
@@ -176,13 +192,17 @@ $(document).ready(function(){
     return polyline;
   }
   function createMarker(LatLng, vehicle, type) {
-    var color = getTransportHex(type, 'light');
+    var color = getTransportHex(type);
+    var icontype = getIconType(type);
+
+    //old icon: "https://chart.googleapis.com/chart?chst=d_map_spin&chld=1|0|"+color+"|11|b|"+vehicle
 
     var marker = new google.maps.Marker({
       position: LatLng,
       draggable: false,
       title: vehicle+"",
-      icon: "https://chart.googleapis.com/chart?chst=d_map_spin&chld=1|0|"+color+"|11|b|"+vehicle
+      icon: "https://chart.googleapis.com/chart?chst=d_simple_text_icon_below&chld="+vehicle+"|16|fff|"
+        +icontype+"|16|"+color+"|333"
     });
     marker.setMap(map);
     return marker;
@@ -256,7 +276,7 @@ $(document).ready(function(){
     var toLatLng = endMarker.getPosition()
     var to = toLatLng.lng() + "," + toLatLng.lat()
     //console.log("to:"+to)
-   
+
     var time = $("#time").val().replace(":","");
 
     var params = "?request=route&from="+from+"&to="+to+"&time="+time+"&format=json&epsg_in=wgs84&epsg_out=wgs84"
@@ -275,8 +295,9 @@ $(document).ready(function(){
         var endTime = route.legs[route.legs.length-1].locs[route.legs[route.legs.length-1].locs.length-1].arrTime;
         result.append("<h4>"
             +startTime.substr(8,2)+":"+startTime.substr(10,2)
-            +" &ndash; "
+            +"&ndash;"
             +endTime.substr(8,2)+":"+endTime.substr(10,2)
+            +" ("+route.duration/60 + " mins)"
             +"</h4>");
 
         var legs = $("<ol></ol>").appendTo(result)
@@ -291,7 +312,7 @@ $(document).ready(function(){
           legItem.append("<span class='type'>"+type+"</span> ");
 
           if(type === "walk"){
-             legItem.append("<span class='meters'>"+leg.length + "m</span>");
+             legItem.append("<span class='meters'>"+leg.length + " m</span>");
           } else {
             legItem.append("<span class='type'>" + formatVehicleCode(leg.code,type) + "</span> ");
 
@@ -317,7 +338,7 @@ $(document).ready(function(){
         });
 
         //result.append("Length: " + route.length + "m<br/>");
-        result.append("Duration: " + route.duration/60 + " minutes");
+        //result.append("Duration: " + route.duration/60 + " minutes");
         $("#results").append(result);
         
         // Show route on map when clicked
