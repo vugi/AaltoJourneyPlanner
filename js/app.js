@@ -56,6 +56,12 @@ $(document).ready(function(){
 		stylers: [
 		  { lightness: -20 }
 		]
+	  },{
+		featureType: "poi",
+		elementType: "labels",
+		stylers: [
+		  { visibility: "off" }
+		]
 	  }
 	], {name: "AaltoWindow style"});
 	
