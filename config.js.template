@@ -2,7 +2,13 @@
   Aalto Journey Planner configuration
   
   Copy this file as config.js and insert the correct configuration
-
+  
+  Following optional parameters are available for location items:
+  
+  "nomap": no marker on the map
+  "start": default start point
+  "end": default end poit
+  
   Reittiopas account can be requested from:
   http://developer.reittiopas.fi/pages/en/account-request.php
  */
@@ -10,5 +16,29 @@
 var config = {
   "api":"apiProxy/hsl/prod/",
   "user":"",
-  "pass":""
+  "pass":"",
+  "locs": {
+    "mapcenter": {
+      "lat":60.181925,
+      "lng":24.902101,
+      "nomap":true
+    },
+    "otaniemi": {
+      "title":"Otaniemi",
+      "lat":60.186982,
+      "lng":24.827256,
+      "start":true,
+      "nomap":true
+    },
+    "toolo": {
+      "title":"Töölö",
+      "lat":60.172058,
+      "lng":24.923424
+    },
+    "arabia": {
+      "title":"Arabia",
+      "lat":60.20875,
+      "lng":24.97562
+    }
+  }
 }
